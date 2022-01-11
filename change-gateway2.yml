@@ -9,15 +9,16 @@
 
   - block: # ===Block for RedHat===
 
-      - name:
-        shell:
+      - name: Install net-tools for RedHat
+        yum:  name=net-tools state=latest
 
-      - name: change default gateway address in RedHat
+      - name: Change default gateway address in RedHat
         shell: tac /etc/sysconfig/network-scripts/ifcfg-eth0 | awk -F'.' -v IGNORECASE="1" -v OFS="." '/default/{if(FNR==1){$NF=6};print}' | tac  > temp && mv temp tac /etc/sysconfig/network-scripts/ifcfg-eth0 
-      - name: restart networking service
+
+      - name: Restart networking service
         shell: systemctl restart networking
 
-      - name: check ip configuration
+      - name: Check ip configuration
         shell: netstat -rn
 
     when: ansible_os_family == "RedHat"
@@ -26,16 +27,16 @@
   - block: # ===Block for Debian===
 
 
-      - name:
-        shell:
+      - name: Install nano for Debian
+        apt:  name=net-tools state=latest
 
-      - name: change default gateway address Debian
+      - name: Change default gateway address Debian
         shell: tac /etc/network/interfaces | awk -F'.' -v IGNORECASE="1" -v OFS="." '/default/{if(FNR==1){$NF=6};print}' | tac  > temp && mv temp /etc/network/interfaces
 
-      - name: restart networking service
+      - name: Restart networking service
         shell: systemctl restart networking
 
-      - name: check ip configuration
+      - name: Check ip configuration
         shell: netstat -rn
 
     when: ansible_os_family == "Debian"
