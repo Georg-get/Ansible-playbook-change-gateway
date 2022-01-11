@@ -1,0 +1,41 @@
+---
+- name: Test connection to my all servers
+  hosts: all #your group
+  become: yes
+
+  tasks:
+  - name: Check and Print Linux version
+    debug: var=ansible_os_family
+
+  - block: # ===Block for RedHat===
+
+      - name:
+        shell:
+
+      - name: change default gateway address in RedHat
+        shell: tac /etc/sysconfig/network-scripts/ifcfg-eth0 | awk -F'.' -v IGNORECASE="1" -v OFS="." '/default/{if(FNR==1){$NF=6};print}' | tac  > temp && mv temp tac /etc/sysconfig/network-scripts/ifcfg-eth0 
+      - name: restart networking service
+        shell: systemctl restart networking
+
+      - name: check ip configuration
+        shell: netstat -rn
+
+    when: ansible_os_family == "RedHat"
+
+
+  - block: # ===Block for Debian===
+
+
+      - name:
+        shell:
+
+      - name: change default gateway address Debian
+        shell: tac /etc/network/interfaces | awk -F'.' -v IGNORECASE="1" -v OFS="." '/default/{if(FNR==1){$NF=6};print}' | tac  > temp && mv temp /etc/network/interfaces
+
+      - name: restart networking service
+        shell: systemctl restart networking
+
+      - name: check ip configuration
+        shell: netstat -rn
+
+    when: ansible_os_family == "Debian"

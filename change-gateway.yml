@@ -1,0 +1,41 @@
+---
+- name: Test connection to my all servers
+  hosts: all #your group
+  become: yes
+
+  tasks:
+  - name: Check and Print Linux version
+    debug: var=ansible_os_family
+
+  - block: # ===Block for RedHat===
+
+      - name: Install net-tools for RedHat
+        yum:  name=net-tools state=latest
+
+      - name: Removing the old Gateway
+        shell: route del default gw #old Gateway
+
+      - name: Adding a new gateway
+        shell: route add default gw #new Gateway
+
+      - name: Check ip configuration
+        shell : netstat -rn     
+
+    when: ansible_os_family == "RedHat"
+
+
+  - block: # ===Block for Debian===
+
+      - name: Install nano for Debian
+        apt:  name=net-tools state=latest
+
+      - name:  Removing the old Gateway
+        shell: route del default gw #old Gateway
+
+      - name: Adding a new Gateway
+        shell: route add default gw #new Gateway
+
+      - name: Check ip configuration
+        shell: netstat -rn
+
+    when: ansible_os_family == "Debian"
