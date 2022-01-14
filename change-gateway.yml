@@ -2,7 +2,11 @@
 - name: Test connection to my all servers
   hosts: all #your group
   become: yes
-
+  
+  tasks:
+  - name: Ping all servers
+    ping:
+    
   tasks:
   - name: Check and Print Linux version
     debug: var=ansible_os_family
